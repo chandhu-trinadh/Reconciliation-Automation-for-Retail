@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconciled Data</title>
+
+    <!-- Add SheetJS library for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+    <style>
+        /* Styling for the table and form */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #date,
+        #orderID {
+            width: 300px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        label[for="date"],
+        label[for="orderID"] {
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Reconciled Data</h1>
+
+    <!-- Download Button -->
+    <button id="download-excel-btn">Download Excel</button>
+
+    <!-- Search Bar -->
+    <form id="searchForm">
+        <label for="date">Search by Date:</label>
+        <input type="text" id="date" name="date" oninput="filterTable()" placeholder="Enter date...">
+        <label for="orderID">Search by Bill ID:</label>
+        <input type="text" id="orderID" name="orderID" oninput="filterTable()" placeholder="Enter Bill ID...">
+    </form>
+
+    <!-- Data table -->
+    <table border="1" id="dataTable">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Shop Name</th>
+                <th>Store ID</th>
+                <th colspan="5">Data from Concessionaire</th>
+                <th colspan="5">Data from Central Dashboard</th>
+                <th colspan="3">Variance</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>Date</th>
+                <th>Bill ID</th>
+                <th>Bill Amt</th>
+                <th>Net Sale</th>
+                <th>Tax</th>
+                <th>Date</th>
+                <th>Bill ID</th>
+                <th>Bill Amt</th>
+                <th>Net Sale</th>
+                <th>Tax</th>
+                <th>Bill Amt</th>
+                <th>Net Sale</th>
+                <th>Tax</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Here goes the difference data -->
+            {% if differences %}
+            {% for difference in differences %}
+            <tr>
+                <td>{{ difference.SerialNumber }}</td>
+                <td id="shopName">{{ difference.shop_name }}</td>
+                <td>{{ difference.ns_cin }}</td>
+                <td>{{ difference.date }}</td>
+                <td>{{ difference.order_id }}</td>
+                <td>{{ difference.total }}</td>
+                <td>{{ difference.net }}</td>
+                <td>{{ difference.tax }}</td>
+                <td>{{ difference.date }}</td>
+                <td>{{ difference.order_id }}</td>
+                <td>{{ difference.amount }}</td>
+                <td>{{ difference.taxable_amount }}</td>
+                <td>{{ difference.tl_tax_amount }}</td>
+                <td>{{ difference.Bill_Difference }}</td>
+                <td>{{ difference.Net_Difference }}</td>
+                <td>{{ difference.Tax_Difference }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="14">No data available.</td>
+            </tr>
+            {% endif %}
+            <!-- End of difference data -->
+        </tbody>
+    </table>
+
+    <!-- Search and filter script -->
+    <script>
+        function filterTable() {
+            // Get input values from the search form
+            const inputDate = document.getElementById('date').value.toUpperCase();
+            const inputOrderID = document.getElementById('orderID').value.toUpperCase();
+
+            // Get the data table and rows
+            const table = document.getElementById('dataTable');
+            const rows = table.getElementsByTagName('tr');
+
+            // Loop through each row to filter
+            for (let i = 1; i < rows.length; i++) {
+                const dateCol = rows[i].getElementsByTagName('td')[3]; // Date column is in index 3
+                const orderIDCol = rows[i].getElementsByTagName('td')[4]; // Order ID column is in index 4
+
+                if (dateCol && orderIDCol) {
+                    // Get the text content from date and order ID columns
+                    const dateValue = dateCol.textContent.toUpperCase() || dateCol.innerText.toUpperCase();
+                    const orderIDValue = orderIDCol.textContent.toUpperCase() || orderIDCol.innerText.toUpperCase();
+
+                    // Check if the date and order ID match the input values
+                    const matchDate = dateValue.includes(inputDate) || inputDate === '';
+                    const matchOrderID = orderIDValue.includes(inputOrderID) || inputOrderID === '';
+
+                    // Show or hide the row based on the match results
+                    if (matchDate && matchOrderID) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Add Excel download script -->
+    <script>
+        // Function to download Excel file
+        function downloadExcel(filename) {
+            const table = document.getElementById('dataTable');
+             
+            const rows = table.getElementsByTagName('tr');
+            console.log('const rows')
+            // Create a new Excel workbook
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.table_to_sheet(table);
+        
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+            // Save the workbook as an Excel file
+            XLSX.writeFile(workbook, filename);
+
+    }
+
+        const fName = document.getElementById('shopName').textContent;
+        
+        // Attach click event listener to the download button
+        document.getElementById('download-excel-btn').addEventListener('click', function () {
+            downloadExcel(filename = fName  +'.xlsx');
+        });
+
+        
+    </script>
+</body>
+
+</html>

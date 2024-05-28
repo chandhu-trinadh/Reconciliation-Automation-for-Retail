@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Selection and Reports</title>
+
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #041104;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #061406;
+        }
+        /* Styling for reports table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Shop Selection and Upload CSV</h1>
+        <form action="/" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="shop_id">Shop</label>
+                <select id="shop_id" name="shop_id" required>
+                    <option value="">Select a Shop</option>
+                    {% for shop_id, shop_name_nscin in shops %}
+                        <option value="{{ shop_id }}">{{ shop_name_nscin }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="from_date_picker">From Date</label>
+                <input type="date" name="from_date_picker" id="from_date_picker" required>
+            </div>
+            <div class="form-group">
+                <label for="to_date_picker">To Date</label>
+                <input type="date" name="to_date_picker" id="to_date_picker" required>
+            </div>
+            <div class="form-group">
+                <label for="source_file">Upload CSV File</label>
+                <input type="file" name="source_file" id="source_file" accept=".csv" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        
+        {% if reports_list %}
+            <h2>Reports</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports_list %}
+                        <tr>
+                            <td>{{ report.date }}</td>
+                            <td>{{ report.data }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</body>
+</html>
