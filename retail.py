@@ -53,10 +53,8 @@ def index():
             #csv_df['date'] = csv_df['date'].dt.strftime('%d-%m-%Y')
             # Sort DataFrame by 'date' column in ascending order
             csv_df = csv_df.sort_values(by='date', ascending=True) 
-            #logger.debug("CSV DataFrame loaded and filtered.")
-            
-            # Print the filtered CSV DataFrame
-            #logger.debug("Filtered CSV DataFrame:\n%s", csv_df)
+            logger.debug("CSV DataFrame loaded and filtered.")
+            logger.debug("Filtered CSV DataFrame:\n%s", csv_df)
 
             if csv_df.empty:
                 logger.debug("No records found in the CSV file for the selected date range.")
@@ -98,7 +96,7 @@ def index():
         
         # Convert the cursor to a DataFrame
         reports_df = pd.DataFrame(list(reports_data_cursor))
-        print(reports_df['date'])
+        # print(reports_df['date'])
         
         # Log the entire Reports DataFrame for debugging
         logger.debug("Reports DataFrame:\n%s", reports_df)
@@ -151,10 +149,6 @@ def index():
         # Round off float values to two decimal places
         final_selected_df = final_selected_df.round(2)
 
-        # Print the final concatenated DataFrame
-        print("Final Concatenated DataFrame:")
-        print(final_selected_df)
-
         # Calculate total for each column
         total_row = {
             'SerialNumber': 'Total',
@@ -174,9 +168,9 @@ def index():
         # Append total row to DataFrame
         final_selected_df = pd.concat([final_selected_df, total_df], ignore_index=True)
        
-        # Replace NaN and NaT values with empty strings# Replace NaN values with empty strings
+        # Replace NaN and NaT values with empty strings
         final_selected_df = final_selected_df.fillna('')
-# Replace NaT values in the 'date' column with empty strings# Specifically replace NaT values in the 'date' column with empty strings
+        # Replace NaT values in the 'date' column with empty strings
         final_selected_df['date'] = final_selected_df['date'].apply(lambda x: '' if pd.isnull(x) else x)
    
         #logger.debug("Final DataFrame with totals:\n%s", final_selected_df)
